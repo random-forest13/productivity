@@ -1,1 +1,38 @@
 Sub Fetch()
+
+Debug.Print "Start"
+Dim objNS As Outlook.Namespace: Set objNS = GetNamespace("MAPI")
+Dim olFolder As Outlook.MAPIFolder
+'Set olFolder = objNS.GetDefaultFolder(olFolderInbox)
+Set olFolder = objNS.PickFolder()
+
+Dim Item As Object
+Dim msgSubject As String
+Dim subArray() As String
+Dim objAtt as Outlook.Attachment
+Dim saveFolder As String
+Dim dateFormat As String
+Dim i As Integer
+
+saveFolder = ActiveWorkbook.Sheets("Config").Range("B3").Value
+subArray = Split (ActiveWorkbook.Sheets("Config").Range("B2").Value, ";")
+
+For Each Item In olFolder.Items
+  For i = 0 To UBound(subArray)
+  msgSubject = subArray(i)
+  
+  If TypeOf Item is Outlook.MailItem Then
+    If Item.Subject Like "*" & msgSubject & "*" Then
+      Debug.Print Item.Subject
+      dateFormat = Format(Item.ReceivedTime, "yyyy-mm-dd H-mm-ss")
+      For Each objAtt in Items.Attachments
+        If LCase(objAtt.DisplayName) Like "*.xls*" Or LCase(objAtt.DisplayName) Like "*.zip*" Then
+          objAtt.SavesAsFile saveFolder & "\" & objAtt.DisplayName
+          If LCase(objAtt.DisplayName) Like "*.zip*" Then
+            Call UnzipAFile(saveFolder & "\" & objAtt.DisplayName, saveFolder & "\")
+          EndIf
+          
+          EndIf
+        Next
+        
+        
