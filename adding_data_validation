@@ -1,0 +1,45 @@
+'To insert a button, click Developer > Insert > Button (Form Control)
+'Fetch is the name of the button
+
+Sub Fetch()
+Dim comments As String
+'VBA is an interpreted language where you need not necessarily define the data types, but this is good practice
+
+'First, open the LOOKUP table in the reference workbook
+Dim ws As Worksheet
+Dim sht As Worksheet
+Dim range1 As Range, rng As Range
+Dim wbk As Workbook, wb As Workbook
+Dim OldWorkbook As Variant
+
+Workbooks.OpenFilename:="\\example_folder\file_name.xlsx"
+Set wbk = Application.Workbooks("file_name.xlsx")
+Set ws = wbk.Worksheets("Config")
+
+'Now let's open the working excel file manually
+OldWorkbook = Application.GetOpenFilename("Excel Files (*.xl*), *.xl*", , "Choose File", "Open", False)
+  If OldWorkbook = False Then
+    Exit Sub 'To prevent an error from occuring when cancelling the dialog
+  Else
+    Set wb = Workbooks.Open(OldWorkbook)
+  End If
+
+Set sht = wb.Worksheets("Sheet1")
+Set rng = sht.Range("L:L")
+
+'You can only take data validation LOOKUP table from the same workfbook and not from a different reference notebook
+'Hence need to copy and paste the LOOKUP table into the working notebook
+wbk.Sheets("Config").Range("C2:C8").Copy
+wb.Sheets("Sheet1").Range("AD1:AD7").PasteSpecial
+
+Set range1 = sht.Range("AD1:AD7")
+
+'Now perform data validation
+With rng.Validation
+  .Delete'delete previous validation
+  .Add Type:=xlValidateList, AlertStyle:=xlValidAlertInformation, _
+    Formula:="='" & sht.Name & "'!" & range1.Address
+End With
+
+MsgBox("Success!")
+End Sub
