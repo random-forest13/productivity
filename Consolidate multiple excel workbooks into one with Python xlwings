@@ -1,0 +1,25 @@
+#Combine multiple excel reports into one unified excel report
+
+import os, glob, xlwings
+finalReport = xlwings.Book()
+
+#Create an empty list for sheet names
+Sheet_name = []
+
+#In Python, the glob module is used to retrieve files or pathnames matching a specified pattern.
+#Enumerate() method adds a counter to an iterable and returns it in a form of enumerating object.
+#This enumerated object can then be used directly for loops or converted into a list of tuples using the list() method.
+
+for _, filename in enumerate(glob.glob(df.Location[0]+'\\*'))
+  if filename.endswith((".xls",".xlsx")):
+    wb = xlwings.Book(filename)
+    ws = wb.sheets(1)
+    Sheet_name.append(ws.name)
+    ws.api.Copy(Before = finalReport.sheets(1).api)
+
+for sheet in finalReport.sheets:
+  if sheet.name not in Sheet_name:
+    sheet.delete()
+    
+finalReport.save(df.Location[0]+'\\'+df.FileName[0]+'.xlsx')
+finalReport.app.quit()
